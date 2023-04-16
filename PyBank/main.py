@@ -4,60 +4,68 @@ import csv
 #set path for file
 csvpath = os.path.join('.', 'Resources', 'budget_data.csv')
 
-#set variables
+# Create empty lists to iterate through specific rows for the following variables
+total_months = []
+total_profit = []
+monthly_profit_change = []
+ 
+# Open csv in default read mode with context manager
+with open(csvpath) as csvfile:
+    
+     # Store the contents of budget_data.csv in the variable csvreader
+    csvreader = csv.reader(csvfile, delimiter=",") 
 
-count = 0
-total_months = 0
-total_revenue = 0
-previous_revenue = 0
-change_month = 0
-revenue_change = 0
-greatest_decrease = ['',9999999]
-greatest_increase = ["", 0]
-revenue_change_list = [1]
-revenue_average = 0
+    # Skip the header labels to iterate with the values
+    header = next(csvreader)  
 
-#open csv file
-with open(csvpath) as csv_file:
+    # Iterate through the rows in the stored file contents
+    for row in csvreader: 
 
-    csv_reader = csv.reader(csv_file, delimiter=",")
+        # Append the total months and total profit to their corresponding lists
+        total_months.append(row[0])
+        total_profit.append(int(row[1]))
 
-    csv_header = next(csv_file)  
-
-  
-    for row in csv_reader:
-        total_months += 1
-        total_revenue += int(row[1])
+    # Iterate through the profits in order to get the monthly change in profits
+    for i in range(len(total_profit)-1):
         
+        # Take the difference between two months and append to monthly profit change
+        monthly_profit_change.append(total_profit[i+1]-total_profit[i])
         
+# Obtain the max and min of the the montly profit change list
+max_increase_value = max(monthly_profit_change)
+max_decrease_value = min(monthly_profit_change)
 
-        #Calculate average change in revenue between months over the entire period
-       
-        revenue_change = int(row[1])- previous_revenue
-        previous_revenue = int(row[1])
-        #revenue_change_list = revenue_change_list + [revenue_change]
-        change_month = [change_month] + [row[0]]
-        
-
-        #The greatest increase in revenue over the entire period
-        if revenue_change > greatest_increase[1]:
-            greatest_increase[1] = revenue_change
-            greatest_increase[0] = row[0]
-
-        #The greates decrease in revenue over the entire period
-        if revenue_change < greatest_decrease[1]:
-            greatest_decrease[1] = revenue_change
-            greatest_decrease[0] = row[0]
-    revenue_average = sum(revenue_change_list)/len(revenue_change_list)
+# Calculate max and min to the proper month using month list and index from max and min
+max_increase_month = monthly_profit_change.index(max(monthly_profit_change)) + 1
+max_decrease_month = monthly_profit_change.index(min(monthly_profit_change)) + 1 
 
 
 #Print values
 print("Financial Analysis")
 print("----------------------------")
-print(f"Total Months: {total_months}")
-print(f"Total: ${total_revenue}")
-#print(f"Average Change: ${revenue_average}")
-print(f"Greatest Increase in Profits: {greatest_increase[0]} (${greatest_increase[1]})")
-print(f"Greatest Decrease in Profits: {greatest_decrease[0]} (${greatest_decrease[1]})")
+print(f"Total Months: {len(total_months)}")
+print(f"Total: ${sum(total_profit)}")
+print(f"Average Change: {round(sum(monthly_profit_change)/len(monthly_profit_change),2)}")
+print(f"Greatest Increase in Profits: {total_months[max_increase_month]} (${(str(max_increase_value))})")
+print(f"Greatest Decrease in Profits: {total_months[max_decrease_month]} (${(str(max_decrease_value))})")
 
+#Output files
+output_file = os.path.join(".", "analysis", "Analysis_Summary.txt")
+
+with open(output_file,"w") as file:
+    
+# Write methods to print to Financial_Analysis_Summary 
+    file.write("Financial Analysis")
+    file.write("\n")
+    file.write("----------------------------")
+    file.write("\n")
+    file.write(f"Total Months: {len(total_months)}")
+    file.write("\n")
+    file.write(f"Total: ${sum(total_profit)}")
+    file.write("\n")
+    file.write(f"Average Change: {round(sum(monthly_profit_change)/len(monthly_profit_change),2)}")
+    file.write("\n")
+    file.write(f"Greatest Increase in Profits: {total_months[max_increase_month]} (${(str(max_increase_value))})")
+    file.write("\n")
+    file.write(f"Greatest Decrease in Profits: {total_months[max_decrease_month]} (${(str(max_decrease_value))})")
 
