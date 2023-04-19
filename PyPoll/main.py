@@ -34,6 +34,7 @@ with open(csvpath, newline='') as csvfile:
         unique_candidates.append(candidate)
         votes = candidates.count(candidate)
         votes_per_candidate.append(votes)
+        unique_candidates.sort()
 
     #Calculate the percentage of votes each candidate received
     percentages = [(votes / total_votes) * 100 for votes in votes_per_candidate]
